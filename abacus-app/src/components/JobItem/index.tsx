@@ -4,6 +4,7 @@ import {
   getCountry,
   getJobPostingTimeFromNow,
   getRelocationStatus,
+  tileSize,
 } from '@utils';
 import { memo } from 'react';
 import { Image, View } from 'react-native';
@@ -19,7 +20,7 @@ interface JobItemProps {
 
 const JobItem = ({ job }: JobItemProps) => {
   return (
-    <View style={styles.touchableContainer}>
+    <View style={[styles.touchableContainer, { width: tileSize }]}>
       <View key={job?.id} style={styles.jobItemContainer}>
         <View style={styles.jobImage}>
           <Image
@@ -51,7 +52,7 @@ const JobItem = ({ job }: JobItemProps) => {
 
       <View style={styles.bottomSection}>
         <View style={styles.bottomTabsContainer}>
-          <BottomTab title="Full Time" />
+          <BottomTab title={job?.area} />
           {getCountry(job?.flagCode) && (
             <BottomTab title={getCountry(job?.flagCode) || ''} />
           )}

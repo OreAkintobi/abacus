@@ -5,8 +5,9 @@ const styles = StyleSheet.create({
   touchableContainer: {
     marginBottom: 8,
     paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: '#272831',
+    paddingHorizontal: 12,
+    marginHorizontal: 4,
+    backgroundColor: colors.background,
     borderRadius: 12,
     justifyContent: 'space-between',
   },

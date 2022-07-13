@@ -1,11 +1,14 @@
 import { countries } from '@assets';
 import { I_Job } from '@types';
 import moment from 'moment';
+import { Dimensions } from 'react-native';
 import { Platform } from 'react-native';
 
-const isWeb = Platform.OS === 'web';
+const { width } = Dimensions.get('window');
+const isWeb = Platform.OS === 'web' || width > 480;
 
 export const numberOfColumns = isWeb ? 3 : 1;
+export const tileSize = width / numberOfColumns - 16;
 
 export * from './hooks';
 

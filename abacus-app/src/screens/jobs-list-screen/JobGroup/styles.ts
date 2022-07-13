@@ -6,5 +6,6 @@ export const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: 'bold',
     color: colors.mediumGray,
+    marginVertical: 8,
   },
 });

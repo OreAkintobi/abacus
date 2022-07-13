@@ -4,7 +4,7 @@ import { colors } from '@theme';
 import { I_Job } from '@types';
 import { getMonthAndYear } from '@utils';
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, ScrollView, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { Appbar } from 'react-native-paper';
 import { Searchbar } from 'react-native-paper';
@@ -24,6 +24,13 @@ export const JobsListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchbarVisible, setSearchbarVisible] = useState(false);
 
+  const [filter, setFilter] = useState([
+    'Remote',
+    'Relocate',
+    'Internal',
+    'External',
+  ]);
+
   const currentHeight = useSharedValue(0);
   const currentOpacity = useSharedValue(0);
 
@@ -31,28 +38,43 @@ export const JobsListScreen = () => {
     return { height: currentHeight.value, opacity: currentOpacity.value };
   });
 
-  const onChangeSearch = (query: string) => setSearchQuery(query);
+  const filterTabs = ['Remote', 'Relocate', 'Internal', 'External'];
 
+  const onChangeSearch = (query: string) => setSearchQuery(query);
   const handleShowSearchBar = () => setSearchbarVisible(!searchbarVisible);
+
+  const updateFilters = (tag: string) => {
+    setFilter(prevState => {
+      let newState = [...prevState];
+      if (newState.includes(tag)) {
+        newState = newState.filter((item: string) => item !== tag);
+      } else {
+        newState.push(tag);
+      }
+      return newState;
+    });
+  };
+
+  const showFilteredJobs = useMemo(() => {
+    // update displayed jobs based on filter
+    return (data?.items ?? [])
+      .filter(
+        (job: I_Job) =>
+          job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          job.companyName.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      .filter((job: I_Job) => {
+        return filter.includes(job.relocate) && filter.includes(job.area);
+      }) as I_Job[];
+  }, [data?.items, filter, searchQuery]);
 
   const renderItem = ({ item, index }: any) => (
     <JobGroup key={index} data={item} />
   );
-
   const keyExtractor = (_item: any, index: number) => String(index);
 
-  const filteredJobs = useMemo(() => {
-    const jobs = (data?.items ?? []).filter(
-      (job: I_Job) =>
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.companyName.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-    return jobs as I_Job[];
-  }, [data?.items, searchQuery]);
-
   const jobs = useMemo(() => {
-    // create copy of data?.items and sort by date
-    const jobsList = filteredJobs.sort((a, b) => {
+    const jobsList = showFilteredJobs.sort((a, b) => {
       const dateA = new Date(a.createdAt).getTime();
       const dateB = new Date(b.createdAt).getTime();
       return dateA - dateB;
@@ -71,20 +93,12 @@ export const JobsListScreen = () => {
       categories[key].push(jobListItem);
     });
 
-    // if (searchQuery.length > 0) {
-    //   return data?.jobs?.filter((job: any) => {
-    //     return job.title.toLowerCase().includes(searchQuery.toLowerCase());
-    //   });
-    // }
-    // return data?.jobs;
-
-    // console.log('CATSS =>', categories);
     return categories;
-  }, [filteredJobs]);
+  }, [showFilteredJobs]);
 
   useEffect(() => {
     if (searchbarVisible) {
-      currentHeight.value = withTiming(60, { duration: 500 });
+      currentHeight.value = withTiming(100, { duration: 500 });
       currentOpacity.value = withTiming(1, { duration: 900 });
     } else {
       currentOpacity.value = withTiming(0, { duration: 200 });
@@ -117,6 +131,26 @@ export const JobsListScreen = () => {
               style={styles.searchBar}
               value={searchQuery}
             />
+            <ScrollView horizontal>
+              {filterTabs.map((tab, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    updateFilters(tab);
+                  }}
+                  style={[
+                    styles.tab,
+                    {
+                      backgroundColor: filter.includes(tab)
+                        ? colors.blue
+                        : undefined,
+                    },
+                  ]}
+                >
+                  <Text style={styles.tabText}>{tab}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </Animated.View>
 
           <View style={styles.categoryContainer}>

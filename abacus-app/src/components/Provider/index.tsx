@@ -1,6 +1,6 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { API_URL } from '@env';
-import { fonts } from '@theme';
+import { colors, fonts } from '@theme';
 import { StatusBar } from 'expo-status-bar';
 import { PropsWithChildren } from 'react';
 import {
@@ -75,6 +75,11 @@ const fontConfig = {
 const theme = {
   ...DefaultTheme,
   fonts: configureFonts(fontConfig as any),
+  colors: {
+    ...DefaultTheme.colors,
+    primary: colors.blue,
+    accent: colors.lightGray,
+  },
 };
 
 export const WithProviders = ({ children }: PropsWithChildren<{}>) => {

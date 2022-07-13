@@ -8,14 +8,23 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   errorText: {
-    color: 'red',
+    color: colors.red,
+  },
+  tab: {
+    padding: 8,
+    margin: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+  },
+  tabText: {
+    color: colors.white,
   },
   categoryContainer: {
     backgroundColor: colors.black,
     flex: 1,
     alignItems: 'center',
     paddingBottom: 20,
-    paddingHorizontal: 20,
   },
   searchBar: { borderRadius: 0 },
 });
