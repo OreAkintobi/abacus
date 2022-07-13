@@ -1,0 +1,24 @@
+schema {
+  query: Query
+}
+
+type Items {
+  id: String
+  createdAt: String
+  numberOfPositions: Int
+  companyName: String
+  title: String
+  area: String
+  description: String
+  flagCode: String
+  relocate: String
+  salaryFrom: Int
+  salaryTo: Int
+  currency: String
+  jobType: String
+  skills: String
+}
+
+type Query {
+  items: [Items]
+}
