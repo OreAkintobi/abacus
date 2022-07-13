@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 type TAppStackParamList = TAppRoutesStackParamList;
 
 export type TAppRoutesStackParamList = ParamListBase & {
-  Award: undefined;
+  Jobs: undefined;
 };
 
 declare global {
@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-export type AwardScreenProps = NativeStackScreenProps<
+export type JobListScreenProps = NativeStackScreenProps<
   TAppRoutesStackParamList,
-  'Award'
+  'Jobs'
 >;

@@ -1,16 +1,21 @@
 import { useQuery } from '@apollo/client';
 import { GET_ALL_JOBS } from '@config';
-import { useEffect, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { colors } from '@theme';
+import { I_Job } from '@types';
+import { getMonthAndYear } from '@utils';
+import { useEffect, useMemo, useState } from 'react';
+import { FlatList, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { Appbar } from 'react-native-paper';
 import { Searchbar } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 
+import { JobGroup } from './JobGroup';
 import { styles } from './styles';
 
 export const JobsListScreen = () => {
@@ -30,13 +35,52 @@ export const JobsListScreen = () => {
 
   const handleShowSearchBar = () => setSearchbarVisible(!searchbarVisible);
 
-  const handleMore = () => console.log('Shown more');
-
   const renderItem = ({ item, index }: any) => (
-    <Text key={index}>{item?.title}</Text>
+    <JobGroup key={index} data={item} />
   );
 
   const keyExtractor = (_item: any, index: number) => String(index);
+
+  const filteredJobs = useMemo(() => {
+    const jobs = (data?.items ?? []).filter(
+      (job: I_Job) =>
+        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.companyName.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+    return jobs as I_Job[];
+  }, [data?.items, searchQuery]);
+
+  const jobs = useMemo(() => {
+    // create copy of data?.items and sort by date
+    const jobsList = filteredJobs.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateA - dateB;
+    });
+
+    const categories: { [key: string]: I_Job[] } = {};
+
+    // sort jobsList into categories by date
+    jobsList.forEach(jobListItem => {
+      const key = `${getMonthAndYear(jobListItem.createdAt)}`;
+
+      if (!categories[key]) {
+        categories[key] = [];
+      }
+
+      categories[key].push(jobListItem);
+    });
+
+    // if (searchQuery.length > 0) {
+    //   return data?.jobs?.filter((job: any) => {
+    //     return job.title.toLowerCase().includes(searchQuery.toLowerCase());
+    //   });
+    // }
+    // return data?.jobs;
+
+    // console.log('CATSS =>', categories);
+    return categories;
+  }, [filteredJobs]);
 
   useEffect(() => {
     if (searchbarVisible) {
@@ -49,47 +93,42 @@ export const JobsListScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchbarVisible]);
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator animating={true} color="black" size="large" />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>{error.message}</Text>
-      </View>
-    );
-  }
-
   return (
-    <>
-      <Appbar.Header>
-        <Appbar.Content title="Title" />
-        <Appbar.Action icon="magnify" onPress={handleShowSearchBar} />
-        <Appbar.Action icon="dots-vertical" onPress={handleMore} />
-      </Appbar.Header>
-
-      <Animated.View style={style}>
-        <Searchbar
-          onChangeText={onChangeSearch}
-          placeholder="Search"
-          style={styles.searchBar}
-          value={searchQuery}
+    <View style={styles.container}>
+      {loading ? (
+        <ActivityIndicator
+          animating={true}
+          color={colors.lightGray}
+          size="large"
         />
-      </Animated.View>
+      ) : error ? (
+        <Text style={styles.errorText}>{error?.message}</Text>
+      ) : (
+        <>
+          <Appbar.Header>
+            <Appbar.Content title="Title" />
+            <Appbar.Action icon="magnify" onPress={handleShowSearchBar} />
+          </Appbar.Header>
 
-      <View style={styles.categoryContainer}>
-        <FlatList
-          data={data?.items}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-    </>
+          <Animated.View style={style}>
+            <Searchbar
+              onChangeText={onChangeSearch}
+              placeholder="Search"
+              style={styles.searchBar}
+              value={searchQuery}
+            />
+          </Animated.View>
+
+          <View style={styles.categoryContainer}>
+            <FlatList
+              data={Object.values(jobs)}
+              keyExtractor={keyExtractor}
+              renderItem={renderItem}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        </>
+      )}
+    </View>
   );
 };

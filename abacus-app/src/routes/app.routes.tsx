@@ -10,10 +10,10 @@ const Stack = createNativeStackNavigator<TAppRoutesStackParamList>();
 export const AppRoutes = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Award">
+      <Stack.Navigator initialRouteName="Jobs">
         <Stack.Screen
           component={JobsListScreen}
-          name="Award"
+          name="Jobs"
           options={{
             headerShown: false,
           }}

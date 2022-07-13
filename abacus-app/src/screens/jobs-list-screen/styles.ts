@@ -1,19 +1,21 @@
+import { colors } from '@theme';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.black,
     justifyContent: 'center',
-    paddingBottom: 60,
   },
   errorText: {
     color: 'red',
   },
   categoryContainer: {
-    justifyContent: 'center',
+    backgroundColor: colors.black,
+    flex: 1,
     alignItems: 'center',
-    marginBottom: 8,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   searchBar: { borderRadius: 0 },
 });
